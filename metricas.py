@@ -58,7 +58,7 @@ def dcg(doc_retornados, doc_relevantes, k=None, debug=True, aproximacao_trec_eva
         k -- Indica até que posição dos documentos retornados deve ser considerada.
         debug -- Indica se é pra imprimir o cálculo intermediário
         aproximacao_trec_eval -- Se True, usa a relevância como Linear. Se False, usa
-            como 2^(rel)
+            como 2^(rel). Além disso, trunca a relevância.
     """
     dcg = 0
     doc_retornados = doc_retornados if k is None else doc_retornados[:k]
@@ -66,7 +66,7 @@ def dcg(doc_retornados, doc_relevantes, k=None, debug=True, aproximacao_trec_eva
         # Relevância do documento
         rel = doc_relevantes.get(doc_id, 0)
         # Cálculo do ganho. Aproximação trec_eval usa diretamente a relevância
-        gain = (2**(rel) - 1) if not aproximacao_trec_eval else rel
+        gain = (2**(rel) - 1) if not aproximacao_trec_eval else int(rel)
         dcg_i = gain/(math.log(rank + 1, 2))
         dcg += dcg_i
         if debug:
@@ -158,6 +158,9 @@ def metricas(resultado_pesquisa, qrels,
     """
     # Remove do qrels os resultados cujo score é 0
     qrels = qrels[qrels[col_qrels_score] > 0]
+    # O TREC_EVAL considera as relevâncias truncadas
+    if aproximacao_trec_eval:
+        qrels = qrels[qrels[col_qrels_score].astype(float).apply(int) > 0]
 
     # Extrai as queries que devem ser analisadas. Se tiver query no resultado que não 
     # está no qrels, ela não será avaliada.
@@ -183,7 +186,7 @@ def metricas(resultado_pesquisa, qrels,
             p_em_k, r_em_k = precisao_recall(docs_retornados, docs_relevantes, valor_k)
             precisao_em_k[valor_k][i_q_key] = p_em_k
             recall_em_k[valor_k][i_q_key] = r_em_k
-            mrr_em_k[valor_k][i_q_key] = mrr(docs_retornados, docs_relevantes, valor_k)
+            mrr_em_k[valor_k][i_q_key] = mrr(docs_retornados, docs_relevantes, valor_k if not aproximacao_trec_eval else None)
             ndcg_em_k[valor_k][i_q_key] = ndcg(resultado_para_query, qrels_para_query, col_resultado_doc_key, col_qrels_doc_key, col_qrels_score, valor_k, debug, aproximacao_trec_eval)
 
     pd_metricas = pd.DataFrame({'QUERY_KEY': query_keys})

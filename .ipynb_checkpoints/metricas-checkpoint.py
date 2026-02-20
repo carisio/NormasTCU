@@ -58,7 +58,7 @@ def dcg(doc_retornados, doc_relevantes, k=None, debug=True, aproximacao_trec_eva
         k -- Indica até que posição dos documentos retornados deve ser considerada.
         debug -- Indica se é pra imprimir o cálculo intermediário
         aproximacao_trec_eval -- Se True, usa a relevância como Linear. Se False, usa
-            como 2^(rel)
+            como 2^(rel). Além disso, trunca a relevância
     """
     dcg = 0
     doc_retornados = doc_retornados if k is None else doc_retornados[:k]
@@ -66,7 +66,7 @@ def dcg(doc_retornados, doc_relevantes, k=None, debug=True, aproximacao_trec_eva
         # Relevância do documento
         rel = doc_relevantes.get(doc_id, 0)
         # Cálculo do ganho. Aproximação trec_eval usa diretamente a relevância
-        gain = (2**(rel) - 1) if not aproximacao_trec_eval else rel
+        gain = (2**(rel) - 1) if not aproximacao_trec_eval else int(rel)
         dcg_i = gain/(math.log(rank + 1, 2))
         dcg += dcg_i
         if debug:

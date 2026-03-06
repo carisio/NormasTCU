@@ -9,7 +9,7 @@ def precisao_recall(docs_retornados, docs_relevantes, k=None):
         Dado um conjunto de documentos retornados e de documentos relevantes,
         calcula a precisão e o recall em k para uma query.
 
-        docs_retornados -- Objeto Series contendo os documentos retornados ordenados
+        docs_retornados -- Objeto Series contendo os documentos retornados ORDENADOS
         docs_relevantes -- Objeto Series contendo os documentos relevantes
         k -- No cálculo da precisão e recall, indica até que posição dos documentos
                 retornados deve ser considerada.
@@ -28,26 +28,23 @@ def precisao_recall(docs_retornados, docs_relevantes, k=None):
 
     return precisao, recall
 
-def mrr(docs_retornados, docs_relevantes, k=None):
+def mrr(docs_retornados, docs_relevantes):
     """
-        Calcula o MRR@k (Mean Reciprocal Rank) para uma query.
+        Calcula o MRR (Mean Reciprocal Rank) para uma query.
 
-        docs_retornados -- Objeto Series contendo os documentos retornados ordenados
+        docs_retornados -- Objeto Series contendo os documentos retornados ORDENADOS
         docs_relevantes -- Objeto Series contendo os documentos relevantes
-        k -- Indica até que posição dos documentos retornados deve ser considerada.
     """
-    if k is None:
-        k = len(docs_retornados)
-
     mrr_score = 0.0
     set_docs_relevantes = set(docs_relevantes)
-    for i in range(min(k, len(docs_retornados))):
+    for i in range(len(docs_retornados)):
         if docs_retornados.iloc[i] in set_docs_relevantes:
             mrr_score = 1.0 / (i+1) # Soma com 1 pois a posição começa em 1 e i começa em 0.
+            print(f'{docs_retornados.iloc[i]} relevante. Posição {i+1}')
             break
     return mrr_score
 
-def dcg(doc_retornados, doc_relevantes, k=None, debug=True, aproximacao_trec_eval=False):
+def dcg(doc_retornados, doc_relevantes, k=None, debug=True, truncar_score=True):
     """
         Calcula DCG@k para uma query.
 
@@ -57,8 +54,7 @@ def dcg(doc_retornados, doc_relevantes, k=None, debug=True, aproximacao_trec_eva
             é o seu score
         k -- Indica até que posição dos documentos retornados deve ser considerada.
         debug -- Indica se é pra imprimir o cálculo intermediário
-        aproximacao_trec_eval -- Se True, usa a relevância como Linear. Se False, usa
-            como 2^(rel). Além disso, trunca a relevância
+        truncar_score -- Se True, trunca o score para inteiro.
     """
     dcg = 0
     doc_retornados = doc_retornados if k is None else doc_retornados[:k]
@@ -66,7 +62,7 @@ def dcg(doc_retornados, doc_relevantes, k=None, debug=True, aproximacao_trec_eva
         # Relevância do documento
         rel = doc_relevantes.get(doc_id, 0)
         # Cálculo do ganho. Aproximação trec_eval usa diretamente a relevância
-        gain = (2**(rel) - 1) if not aproximacao_trec_eval else int(rel)
+        gain = rel if not truncar_score else int(rel)
         dcg_i = gain/(math.log(rank + 1, 2))
         dcg += dcg_i
         if debug:
@@ -76,18 +72,17 @@ def dcg(doc_retornados, doc_relevantes, k=None, debug=True, aproximacao_trec_eva
         print('\n')
     return dcg
 
-def idcg(doc_retornados, doc_relevantes, k=None, debug=True, aproximacao_trec_eval=False):
+def idcg(doc_retornados, doc_relevantes, k=None, debug=True, truncar_score=True):
     """
         Calcula iDCG@k para uma query.
 
-        doc_retornados -- É uma lista de keys de documentos. A posição do documento na lista
-            indica a ordem
+        doc_retornados -- É uma lista de keys de documentos. A POSIÇÃO do documento na lista
+            indica a ORDEM
         docs_relevantes -- É um dict cuja chave é a key e um documento relevante e o valor
             é o seu score
         k -- Indica até que posição dos documentos retornados deve ser considerada.
         debug -- Indica se é pra imprimir o cálculo intermediário
-        aproximacao_trec_eval -- Se True, usa a relevância como Linear. Se False, usa
-            como 2^(rel)
+        truncar_score -- Se True, trunca o score para inteiro
     """
     # Cria uma lista de tuplas (doc_id, relevância, posição original na lista de retornados)
     # para todos os documentos relevantes
@@ -106,14 +101,14 @@ def idcg(doc_retornados, doc_relevantes, k=None, debug=True, aproximacao_trec_ev
     # Extrai apenas os doc_ids da lista ordenada
     doc_retornados_ideal = [doc[0] for doc in docs_ordenados]
 
-    return dcg(doc_retornados_ideal, doc_relevantes, k, debug, aproximacao_trec_eval)
+    return dcg(doc_retornados_ideal, doc_relevantes, k, debug, truncar_score)
 
-def ndcg(resultado_pesquisa, qrels, col_resultado_doc_key, col_qrels_doc_key, col_qrels_score, k=None, debug=True, aproximacao_trec_eval=False):
+def ndcg(resultado_pesquisa, qrels, col_resultado_doc_key, col_qrels_doc_key, col_qrels_score, k=None, debug=True, truncar_score=True):
     """
         Calcula o nDCG@k para uma query
 
         resultado_pesquisa -- DataFrame Pandas com o resultado da pesquisa. Considera que
-            o DataFrame está ordenado de acordo com os documentos retornados
+            o DataFrame está ORDENADO de acordo com os documentos retornados
         qrels -- DataFrame Pandas com o qrels
 
         col_resultado_doc_key -- indica a KEY do documento retornado.
@@ -122,14 +117,13 @@ def ndcg(resultado_pesquisa, qrels, col_resultado_doc_key, col_qrels_doc_key, co
 
         k -- Indica até que posição dos documentos retornados deve ser considerada.
         debug -- Indica se é pra imprimir o cálculo intermediário
-        aproximacao_trec_eval -- Se True, usa a relevância como Linear. Se False, usa
-            como 2^(rel)
+        truncar_score -- Se True, trunca o score para inteiro
     """
     # Converte os pandas para lista de doc_retornados e dict de doc_relevantes por score:
     doc_retornados = resultado_pesquisa[col_resultado_doc_key].tolist()
     doc_relevantes = dict(zip(qrels[col_qrels_doc_key], qrels[col_qrels_score]))
 
-    return dcg(doc_retornados, doc_relevantes, k, debug, aproximacao_trec_eval) / idcg(doc_retornados, doc_relevantes, k, debug, aproximacao_trec_eval)
+    return dcg(doc_retornados, doc_relevantes, k, debug, truncar_score) / idcg(doc_retornados, doc_relevantes, k, debug, truncar_score)
 
 def metricas(resultado_pesquisa, qrels, 
              col_resultado_query_key="QUERY_KEY",
@@ -138,7 +132,7 @@ def metricas(resultado_pesquisa, qrels,
              col_qrels_query_key="QUERY_KEY",
              col_qrels_doc_key="DOC_KEY",
              col_qrels_score="SCORE",
-             k=[5, 10, 20, 50], debug=False, aproximacao_trec_eval=False):
+             k=[5, 10], debug=False, truncar_score=True):
     """
         Calcula um conjunto de métricas para um resultado de pesquisa e um conjunto qrels.
         resultado_pesquisa -- DataFrame Pandas contendo o resultado das pesquisas.
@@ -155,9 +149,13 @@ def metricas(resultado_pesquisa, qrels,
         col_qrels_query_key -- indica a KEY da query que será testada.
         col_qrels_doc_key -- indica a KEY de um documento associado a query.
         col_qrels_score -- indica a relevância do documento para aquela query. Quanto maior, mais relevante.
-    """
+    """        
     # Remove do qrels os resultados cujo score é 0
     qrels = qrels[qrels[col_qrels_score] > 0]
+
+    # O TREC_EVAL considera as relevâncias truncadas
+    if truncar_score:
+        qrels = qrels[qrels[col_qrels_score].astype(float).apply(int) > 0]
 
     # Extrai as queries que devem ser analisadas. Se tiver query no resultado que não 
     # está no qrels, ela não será avaliada.
@@ -165,7 +163,6 @@ def metricas(resultado_pesquisa, qrels,
 
     precisao_em_k = {valor_k: [0]*len(query_keys) for valor_k in k}
     recall_em_k = {valor_k: [0]*len(query_keys) for valor_k in k}
-    mrr_em_k = {valor_k: [0]*len(query_keys) for valor_k in k}
     ndcg_em_k = {valor_k: [0]*len(query_keys) for valor_k in k}
 
     for i_q_key, q_key in enumerate(query_keys):
@@ -183,23 +180,21 @@ def metricas(resultado_pesquisa, qrels,
             p_em_k, r_em_k = precisao_recall(docs_retornados, docs_relevantes, valor_k)
             precisao_em_k[valor_k][i_q_key] = p_em_k
             recall_em_k[valor_k][i_q_key] = r_em_k
-            mrr_em_k[valor_k][i_q_key] = mrr(docs_retornados, docs_relevantes, valor_k)
-            ndcg_em_k[valor_k][i_q_key] = ndcg(resultado_para_query, qrels_para_query, col_resultado_doc_key, col_qrels_doc_key, col_qrels_score, valor_k, debug, aproximacao_trec_eval)
+            ndcg_em_k[valor_k][i_q_key] = ndcg(resultado_para_query, qrels_para_query, col_resultado_doc_key, col_qrels_doc_key, col_qrels_score, valor_k, debug, truncar_score)
 
     pd_metricas = pd.DataFrame({'QUERY_KEY': query_keys})
 
-    # Insere as métricas na ordem: precisão, recall, MRR, nDCG:
+    # Insere as métricas na ordem: precisão, recall, nDCG, MRR:
     for valor_k in k:
         pd_metricas[f'P@{valor_k}'] = precisao_em_k[valor_k]
     for valor_k in k:
         pd_metricas[f'R@{valor_k}'] = recall_em_k[valor_k]
     for valor_k in k:
-        pd_metricas[f'MRR@{valor_k}'] = mrr_em_k[valor_k]
-    for valor_k in k:
         pd_metricas[f'nDCG@{valor_k}'] = ndcg_em_k[valor_k]
+    # MRR não varia com k (usa a mesma formulação do TREC_EVAL)
+    pd_metricas[f'MRR'] = mrr(docs_retornados, docs_relevantes)
 
     return pd_metricas
-
 
 
 # Funções para plotar métricas

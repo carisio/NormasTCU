@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Relevance Assessment</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f6f8;
+    margin: 0;
+    font-size: 18px;
+}
+
+.container {
+    padding: 20px 40px;
+}
+
+.title {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.term-box {
+    background: #e9ecef;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.section-header {
+    margin-bottom: 10px;
+}
+
+.card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+}
+
+.card-content {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.left {
+    flex: 2;
+    position: relative;
+    padding: 15px;
+    border-radius: 6px;
+}
+
+.right {
+    flex: 1;
+}
+
+.meta-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 20px;
+    margin-top: 10px;
+    align-items: end;
+}
+
+.meta {
+    font-size: 15px;
+    color: #444;
+}
+
+.button {
+    margin-top: 10px;
+    display: inline-block;
+    padding: 8px 12px;
+    border: 1px solid #6c63ff;
+    border-radius: 6px;
+    color: #6c63ff;
+    text-decoration: none;
+    font-size: 15px;
+}
+
+.assessment {
+    border-left: 1px solid #ddd;
+    padding-left: 20px;
+    position: relative;
+}
+
+.question {
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+.option {
+    margin-bottom: 8px;
+    font-size: 15px;
+}
+
+.intermediate-box {
+    text-align: center;
+    padding: 12px;
+    margin: 10px 0 20px 0;
+    background: #eef2ff;
+    border: 1px dashed #6c63ff;
+    border-radius: 6px;
+    color: #444;
+    font-size: 15px;
+}
+
+.extra-box {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+textarea {
+    width: 100%;
+    height: 100px;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/* Highlight boxes */
+.highlight-A {
+    border: 3px solid #2a6ebb;
+}
+
+.highlight-B {
+    border: 3px solid #e67e22;
+}
+
+.highlight-C {
+    border: 3px solid #2e7d32;
+}
+
+.highlight-D {
+    border: 3px solid #d62728;
+}
+
+.label {
+    position: absolute;
+    top: -12px;
+    left: -12px;
+    color: white;
+    font-weight: bold;
+    padding: 5px 9px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.label-A { background: #2a6ebb; }
+.label-B { background: #e67e22; }
+.label-C { background: #2e7d32; }
+.label-D { background: #d62728; }
+
+.doc-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 17px;
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <div class="title">
+        Assess the relevance of each suggested document for the search term.
+    </div>
+
+    <div class="term-box highlight-A">
+        <div class="label label-A">A</div>
+        rules of procedure
+    </div>
+
+    <div class="section-header">
+        <div><strong>Suggested documents</strong></div>
+    </div>
+
+    <!-- Document 1 -->
+    <div class="card">
+
+        <div class="card-content">
+
+            <div class="left highlight-B">
+                <div class="label label-B">B</div>
+
+                <div class="doc-title">
+                    Resolution TCU No. 246/2011
+                </div>
+
+                Amends the Rules of Procedure of the Federal Court of Accounts (TCU), approved by Resolution TCU No. 155, of December 4, 2002.
+
+                <div class="meta-row">
+                    <div class="meta">
+                        Status<br>
+                        <strong>Active</strong>
+                    </div>
+
+                    <div class="meta">
+                        In force since<br>
+                        29/11/2011
+                    </div>
+                    <a class="button">View full document</a>
+                </div>
+            </div>
+
+            <div class="right assessment highlight-C">
+                <div class="label label-C">C</div>
+                <div class="question">
+                    What is the relevance of the document to the searched term?
+                </div>
+
+                <div class="option"><input type="radio"> Relevant</div>
+                <div class="option"><input type="radio"> Partially relevant</div>
+                <div class="option"><input type="radio"> Irrelevant</div>
+                <div class="option"><input type="radio"> I don't know</div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Intermediate box -->
+    <div class="intermediate-box">
+        ... other documents available for assessment ...
+    </div>
+
+    <!-- Document 2 (commented out for simplification in the figure) -->
+<!--
+    <div class="card">
+
+        <div class="card-content">
+
+            <div class="left">
+                <div class="doc-title">
+                    Normative Decision TCU No. 12/1996
+                </div>
+
+                Approves individual participation coefficients of the States and the Federal District in the funds provided for in art. 159, item II, of the Federal Constitution, for application in fiscal year 1997.
+
+                <div class="meta-row">
+                    <div class="meta">
+                        Status<br>
+                        <strong>Active</strong>
+                    </div>
+
+                    <div class="meta">
+                        In force since<br>
+                        20/09/1996
+                    </div>
+                    <a class="button">View full document</a>
+                </div>
+            </div>
+
+            <div class="right assessment">
+                <div class="question">
+                    What is the relevance of the document to the searched term?
+                </div>
+
+                <div class="option"><input type="radio"> Relevant</div>
+                <div class="option"><input type="radio"> Partially relevant</div>
+                <div class="option"><input type="radio"> Irrelevant</div>
+                <div class="option"><input type="radio"> I don't know</div>
+            </div>
+
+        </div>
+    </div>
+-->
+
+    <!-- Extra input box -->
+    <div class="extra-box highlight-D" style="position:relative;">
+        <div class="label label-D">D</div>
+        <strong>Suggest additional relevant documents</strong>
+        <textarea placeholder="Insert other documents you consider relevant and briefly justify..."></textarea>
+    </div>
+
+</div>
+
+</body>
+</html>

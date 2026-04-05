@@ -146,10 +146,16 @@ textarea {
     border: 3px solid #d62728;
 }
 
-.label {
+.badge-container {
     position: absolute;
     top: -12px;
-    left: -12px;
+    left: -16px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.label {
     color: white;
     font-weight: bold;
     padding: 5px 9px;
@@ -161,6 +167,16 @@ textarea {
 .label-B { background: #e67e22; }
 .label-C { background: #2e7d32; }
 .label-D { background: #d62728; }
+
+.doc-counter {
+    background: #FAE5D0;
+    border: 1px solid #E7CFB1;
+    color: #7a4b1f;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+}
 
 .doc-title {
     font-weight: bold;
@@ -180,7 +196,9 @@ textarea {
     </div>
 
     <div class="term-box highlight-A">
+        <div class="badge-container">
         <div class="label label-A">A</div>
+    </div>
         rules of procedure
     </div>
 
@@ -194,7 +212,10 @@ textarea {
         <div class="card-content">
 
             <div class="left highlight-B">
-                <div class="label label-B">B</div>
+                <div class="badge-container">
+                    <div class="label label-B">B</div>
+                    <div class="doc-counter">1 of 20</div>
+                </div>
 
                 <div class="doc-title">
                     Resolution TCU No. 246/2011
@@ -217,7 +238,9 @@ textarea {
             </div>
 
             <div class="right assessment highlight-C">
+                <div class="badge-container">
                 <div class="label label-C">C</div>
+            </div>
                 <div class="question">
                     What is the relevance of the document to the searched term?
                 </div>
@@ -231,23 +254,31 @@ textarea {
         </div>
     </div>
 
-    <!-- Intermediate box -->
-    <div class="intermediate-box">
-        ... other documents available for assessment ...
+    <!-- Intermediate continuation bar (SVG wave) -->
+    <div style="margin: 30px 0; text-align:center; color:#777; font-size:14px;">
+        <svg width="100%" height="30" viewBox="0 0 100 20" preserveAspectRatio="none">
+            <path d="M0 10 Q 5 0, 10 10 T 20 10 T 30 10 T 40 10 T 50 10 T 60 10 T 70 10 T 80 10 T 90 10 T 100 10" 
+                  fill="none" stroke="#999" stroke-width="2"/>
+        </svg>
+        <div style="margin-top:4px; letter-spacing:0.5px;">more documents</div>
     </div>
 
-    <!-- Document 2 (commented out for simplification in the figure) -->
-<!--
+    <!-- Document 2 -->
     <div class="card">
 
         <div class="card-content">
 
-            <div class="left">
-                <div class="doc-title">
-                    Normative Decision TCU No. 12/1996
+            <div class="left highlight-B">
+                <div class="badge-container">
+                    <div class="label label-B">B</div>
+                    <div class="doc-counter">20 of 20</div>
                 </div>
 
-                Approves individual participation coefficients of the States and the Federal District in the funds provided for in art. 159, item II, of the Federal Constitution, for application in fiscal year 1997.
+                <div class="doc-title">
+                    Resolution TCU No. 310/2019
+                </div>
+
+                Amends Articles 112 and 120 and repeals Articles 119 and 122 of the Rules of Procedure of the Federal Court of Accounts (TCU), approved by Resolution TCU No. 155/2002 and amended by Resolution TCU No. 246/2011.
 
                 <div class="meta-row">
                     <div class="meta">
@@ -257,13 +288,16 @@ textarea {
 
                     <div class="meta">
                         In force since<br>
-                        20/09/1996
+                        22/5/2019
                     </div>
                     <a class="button">View full document</a>
                 </div>
             </div>
 
-            <div class="right assessment">
+            <div class="right assessment highlight-C">
+                <div class="badge-container">
+                <div class="label label-C">C</div>
+            </div>
                 <div class="question">
                     What is the relevance of the document to the searched term?
                 </div>
@@ -276,11 +310,12 @@ textarea {
 
         </div>
     </div>
--->
 
     <!-- Extra input box -->
     <div class="extra-box highlight-D" style="position:relative;">
+        <div class="badge-container">
         <div class="label label-D">D</div>
+    </div>
         <strong>Suggest additional relevant documents</strong>
         <textarea placeholder="Insert other documents you consider relevant and briefly justify..."></textarea>
     </div>

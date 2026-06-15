@@ -24,7 +24,7 @@ def precisao_recall(docs_retornados, docs_relevantes, k=None):
     docs_retornados_em_k_relevantes = set(docs_retornados_em_k) & set(docs_relevantes)
 
     precisao = len(docs_retornados_em_k_relevantes)/max(k, 1)
-    recall = len(docs_retornados_em_k_relevantes)/len(docs_relevantes)
+    recall = 0 if len(docs_relevantes) == 0 else len(docs_retornados_em_k_relevantes)/len(docs_relevantes)
 
     return precisao, recall
 
@@ -122,7 +122,9 @@ def ndcg(resultado_pesquisa, qrels, col_resultado_doc_key, col_qrels_doc_key, co
     doc_retornados = resultado_pesquisa[col_resultado_doc_key].tolist()
     doc_relevantes = dict(zip(qrels[col_qrels_doc_key], qrels[col_qrels_score]))
 
-    return dcg(doc_retornados, doc_relevantes, k, debug, truncar_score) / idcg(doc_retornados, doc_relevantes, k, debug, truncar_score)
+    dcg_val = dcg(doc_retornados, doc_relevantes, k, debug, truncar_score)
+    idcg_val = idcg(doc_retornados, doc_relevantes, k, debug, truncar_score)
+    return 0 if idcg_val == 0 else dcg_val/idcg_val
 
 def metricas(resultado_pesquisa, qrels, 
              col_resultado_query_key="QUERY_KEY",
@@ -148,17 +150,17 @@ def metricas(resultado_pesquisa, qrels,
         col_qrels_query_key -- indica a KEY da query que será testada.
         col_qrels_doc_key -- indica a KEY de um documento associado a query.
         col_qrels_score -- indica a relevância do documento para aquela query. Quanto maior, mais relevante.
-    """        
+    """
+    # Extrai as queries que devem ser analisadas. Se tiver query no resultado que não 
+    # está no qrels, ela não será avaliada.
+    query_keys = qrels.QUERY_KEY.unique()
+    
     # Remove do qrels os resultados cujo score é 0
     qrels = qrels[qrels[col_qrels_score] > 0]
 
     # O TREC_EVAL considera as relevâncias truncadas
     if truncar_score:
         qrels = qrels[qrels[col_qrels_score].astype(float).apply(int) > 0]
-
-    # Extrai as queries que devem ser analisadas. Se tiver query no resultado que não 
-    # está no qrels, ela não será avaliada.
-    query_keys = qrels.QUERY_KEY.unique()
 
     precisao_em_k = {valor_k: [0]*len(query_keys) for valor_k in k}
     recall_em_k = {valor_k: [0]*len(query_keys) for valor_k in k}

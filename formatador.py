@@ -9,6 +9,10 @@ def remove_html(html):
     text = text.replace('&nbsp;', ' ')
     return re.sub("<[^>]*>", "", text).strip()
 
+def remove_html_and_numbers(html):
+    text = re.sub(r'\d+', '', html)
+    return remove_html(text)
+    
 # Além de remover as tags html, tira os &nbsp (troca por espaço) e substitui os parágrafos por \n
 def html_to_plain_text(html: str) -> str:
     TAG_RE = re.compile(r"<[^>]+>")

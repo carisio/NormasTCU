@@ -56,6 +56,13 @@ class IndiceInvertido:
         # remoção de stop words, lematização etc)
         self.tokenizar = tokenizar
 
+    def adiciona_jsonl(self, nome_arquivo, extrai_id_conteudo_json, total):
+        with open(nome_arquivo, "r", encoding="utf-8") as f:
+            for linha in tqdm(f, total=total):
+                registro = json.loads(linha)
+                id_doc, conteudo_doc = extrai_id_conteudo_json(registro)
+                self.adiciona_doc(id_doc, conteudo_doc)
+                
     def adiciona_dataframe(self, df, extrai_id_conteudo_row):
         for index, row in tqdm(df.iterrows(), total=len(df)):
             id_doc, conteudo_doc = extrai_id_conteudo_row(row)
